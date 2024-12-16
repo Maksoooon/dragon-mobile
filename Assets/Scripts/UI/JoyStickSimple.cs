@@ -1,7 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class JoyStickSimple : MonoBehaviour
 {
@@ -16,62 +14,67 @@ public class JoyStickSimple : MonoBehaviour
     public Transform emptyMovingRightTransform;
     public bool isPaused = false;
     public float movementSpeed;
-
-    private bool isDragging = false;
-
-
-    private void Start()
-    {
-        
-    }
+    public float[] yDiffmax = {};
+    //private bool isDragging = false;
+    private int? joystickFingerId = null;
 
     void Update()
     {
-        ///*
-        if (Input.touchCount > 0 && !isPaused)
+        
+        if (!isPaused)
         {
-            // Iterate through each touch
-            for (int i = 0; i < Input.touchCount; i++)
+            if (Input.touchCount > 0)
             {
-                
-                Touch touch = Input.GetTouch(i);
-                if (i == 0)
+                for (int i = 0; i < Input.touchCount; i++)
                 {
-                    switch (touch.phase)
-                    {
-                        case TouchPhase.Began:
-                            // Handle touch began
-                            emptyStayRight.transform.position = touch.position;
-                            break;
-                        case TouchPhase.Moved:
-                            // Handle touch moved
-                            //emptyMovingRight.transform.position = touch.position - new Vector2(xDiffLast, yDiffLast);
-                            Vector2 targetPosition = touch.position - new Vector2(xDiffLast, yDiffLast);
-                            emptyMovingRight.transform.position = Vector2.Lerp(emptyMovingRight.transform.position, targetPosition, Time.deltaTime * movementSpeed);
-                            xDiff = emptyStayRight.transform.position.x - emptyMovingRight.transform.position.x;
-                            yDiff = emptyStayRight.transform.position.y - emptyMovingRight.transform.position.y;
+                    Touch touch = Input.GetTouch(i);
 
-                            break;
-                        case TouchPhase.Stationary:
-                            // Handle touch stationary
-                            break;
-                        case TouchPhase.Ended:
-                            // Handle touch ended
-                            xDiffLast = xDiff;
-                            yDiffLast = Mathf.Clamp(yDiff, -120, 120);
-                            break;
-                        case TouchPhase.Canceled:
-                            // Handle touch canceled
-                            break;
+                    if (i == 0)
+                    {
+                        if (joystickFingerId == null || joystickFingerId == touch.fingerId)
+                        {
+                            switch (touch.phase)
+                            {
+                                case TouchPhase.Began:
+                                    if (joystickFingerId == null && !isPaused)
+                                    {
+                                        joystickFingerId = touch.fingerId;
+                                        emptyStayRight.transform.position = touch.position;
+                                    }
+                                    break;
+                                case TouchPhase.Moved:
+                                    if (joystickFingerId == touch.fingerId && !isPaused)
+                                    {
+                                        Vector2 targetPosition = touch.position - new Vector2(xDiffLast, yDiffLast);
+                                        emptyMovingRight.transform.position = Vector2.Lerp(emptyMovingRight.transform.position, targetPosition, Time.deltaTime * movementSpeed);
+                                        xDiff = emptyStayRight.transform.position.x - emptyMovingRight.transform.position.x;
+                                        yDiff = emptyStayRight.transform.position.y - emptyMovingRight.transform.position.y;
+
+                                        UpdateEmptyStayRightPosition();
+
+
+
+                                    }
+                                    break;
+                                case TouchPhase.Stationary:
+                                    break;
+                                case TouchPhase.Ended:
+                                case TouchPhase.Canceled:
+                                    if (joystickFingerId == touch.fingerId && !isPaused)
+                                    {
+                                        joystickFingerId = null;
+                                        xDiffLast = xDiff;
+                                        yDiffLast = Mathf.Clamp(yDiff, -120, 120);
+                                    }
+                                    break;
+                            }
+                        }
+                        
                     }
                 }
-                
-
-
             }
-
         }
-        //*/
+
 
         /*
         if (!isPaused)
@@ -102,5 +105,12 @@ public class JoyStickSimple : MonoBehaviour
 
     }
 
+    public void UpdateEmptyStayRightPosition()
+    {
+        Vector3 offset = emptyStayRight.transform.position - emptyMovingRight.transform.position;
 
+        offset.y = Mathf.Clamp(offset.y, -yDiffmax[0], yDiffmax[1]);
+
+        emptyStayRight.transform.position = emptyMovingRight.transform.position + offset;
+    }
 }

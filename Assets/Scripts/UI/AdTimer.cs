@@ -33,7 +33,7 @@ public class ADTimer : MonoBehaviour
         }
         else
         {
-            _PauseMenu.LoseScreen2();
+            //_PauseMenu.LoseScreen2();
         }
     }
     public void StartTimer()

@@ -73,11 +73,11 @@ public class PowerUpSystem : MonoBehaviour
         TripleShotTextAmount = TripleShotButtonGO.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
         LightningTextAmount = LightningButtonGO.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
 
-        PenetrationButtonDimGO = PenetrationButtonGO.transform.GetChild(4).gameObject;
-        BombButtonDimGO = BombButtonGO.transform.GetChild(4).gameObject;
-        FasterButtonDimGO = FasterButtonGO.transform.GetChild(4).gameObject;
-        TripleShotButtonDimGO = TripleShotButtonGO.transform.GetChild(4).gameObject;
-        LightningButtonDimGO = LightningButtonGO.transform.GetChild(4).gameObject;
+        PenetrationButtonDimGO = PenetrationButtonGO.transform.GetChild(2).gameObject;
+        BombButtonDimGO = BombButtonGO.transform.GetChild(2).gameObject;
+        FasterButtonDimGO = FasterButtonGO.transform.GetChild(2).gameObject;
+        TripleShotButtonDimGO = TripleShotButtonGO.transform.GetChild(2).gameObject;
+        LightningButtonDimGO = LightningButtonGO.transform.GetChild(2).gameObject;
        
         SliderCG = SliderGroup.GetComponent<CanvasGroup>();
         SliderCG.alpha = 0f;

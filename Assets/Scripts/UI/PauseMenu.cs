@@ -17,8 +17,9 @@ public class PauseMenu : MonoBehaviour
     public GameObject playerHolder;
     public GameObject winScreen;
     public GameObject loseScreen1;
-    public GameObject loseScreen2;
+    //public GameObject loseScreen2;
     public GameObject miniGameHolder;
+    public GameObject powerUpButton;
 
 
     [HideInInspector] public JoyStickSimple _joystickScript;
@@ -27,6 +28,7 @@ public class PauseMenu : MonoBehaviour
     [HideInInspector] public Minigame _miniGameScript;
     [HideInInspector] public CameraToggle _cameraToggle;
     [HideInInspector] public RewardedAdLoader _adLoaderScript;
+    [HideInInspector] public Countdown _countdown;
 
 
     [Header("UI GameObjects")]
@@ -58,8 +60,9 @@ public class PauseMenu : MonoBehaviour
         goBackButtonGO.gameObject.SetActive(false);
         winScreen.gameObject.SetActive(false);
         loseScreen1.gameObject.SetActive(false);
-        loseScreen2.gameObject.SetActive(false);
+        //loseScreen2.gameObject.SetActive(false);
         miniGameHolder.gameObject.SetActive(false);
+        powerUpButton.gameObject.SetActive(false);
         _dragonSpawnerScript = dragonSpawner.GetComponent<DragonSpawnerNEW>();
         _joystickScript = joystickGO.GetComponent<JoyStickSimple>();
         _playerAimRightLeft = playerHolder.GetComponent<PlayerAimRightLeft>();
@@ -72,6 +75,7 @@ public class PauseMenu : MonoBehaviour
         SoundToggleToggle = SoundToggle.GetComponent<Toggle>();
         _miniGameScript = miniGameHolder.transform.GetChild(0).GetComponent<Minigame>();
         _adLoaderScript = gameObject.GetComponent<RewardedAdLoader>();
+        _countdown = gameObject.GetComponent<Countdown>();
         GetSettings();
     }
 
@@ -85,6 +89,9 @@ public class PauseMenu : MonoBehaviour
         _dragonSpawnerScript.isPaused = GameisPaused;
         _joystickScript.isPaused = GameisPaused;
         SetSettings();
+        _countdown.uiClose = false;
+        _countdown._t = 0;
+        //_countdown._textMeshPro.gameObject.SetActive(false);
     }
 
     public void OpenSettings()
@@ -96,15 +103,19 @@ public class PauseMenu : MonoBehaviour
 
     public void Resume()
     {
-        GameisPaused = false;
+        
+        //GameisPaused = false;
+        _countdown._t = 4;
+        _countdown.uiClose = true;
         pauseMenuUI.gameObject.SetActive(false);
         settingsMenuUI.gameObject.SetActive(false);
         pauseButtonGO.gameObject.SetActive(true);
         goBackButtonGO.gameObject.SetActive(false);
         winScreen.gameObject.SetActive(false);
         loseScreen1.gameObject.SetActive(false);
-        loseScreen2.gameObject.SetActive(false);
+        //loseScreen2.gameObject.SetActive(false);
         miniGameHolder.gameObject.SetActive(false);
+        powerUpButton.gameObject.SetActive(true);
         _dragonSpawnerScript.isPaused = GameisPaused;
         _joystickScript.isPaused = GameisPaused;
         GetSettings();
@@ -118,6 +129,7 @@ public class PauseMenu : MonoBehaviour
         pauseButtonGO.gameObject.SetActive(false);
         goBackButtonGO.gameObject.SetActive(false);
         winScreen.gameObject.SetActive(true);
+        powerUpButton.gameObject.SetActive(false);
         _dragonSpawnerScript.isPaused = GameisPaused;
         _joystickScript.isPaused = GameisPaused;
     }
@@ -129,23 +141,27 @@ public class PauseMenu : MonoBehaviour
         pauseButtonGO.gameObject.SetActive(false);
         goBackButtonGO.gameObject.SetActive(false);
         loseScreen1.gameObject.SetActive(true);
-        loseScreen1.gameObject.transform.GetChild(3).GetComponent<ADTimer>().StartTimer();
-        loseScreen2.gameObject.SetActive(false);
+        miniGameHolder.gameObject.SetActive(false);
+        powerUpButton.gameObject.SetActive(false);
+        //loseScreen1.gameObject.transform.GetChild(3).GetComponent<ADTimer>().StartTimer();
+        //loseScreen2.gameObject.SetActive(false);
         _dragonSpawnerScript.isPaused = GameisPaused;
         _joystickScript.isPaused = GameisPaused;
+        _countdown.uiClose = false;
+        _countdown._t = 0;
     }
-    public void LoseScreen2()
-    {
-        GameisPaused = true;
-        pauseMenuUI.gameObject.SetActive(false);
-        settingsMenuUI.gameObject.SetActive(false);
-        pauseButtonGO.gameObject.SetActive(false);
-        goBackButtonGO.gameObject.SetActive(false);
-        loseScreen1.gameObject.SetActive(false);
-        loseScreen2.gameObject.SetActive(true);
-        _dragonSpawnerScript.isPaused = GameisPaused;
-        _joystickScript.isPaused = GameisPaused;
-    }
+    //public void LoseScreen2()
+    //{
+    //    GameisPaused = true;
+    //    pauseMenuUI.gameObject.SetActive(false);
+    //    settingsMenuUI.gameObject.SetActive(false);
+    //    pauseButtonGO.gameObject.SetActive(false);
+    //    goBackButtonGO.gameObject.SetActive(false);
+    //    loseScreen1.gameObject.SetActive(false);
+    //    loseScreen2.gameObject.SetActive(true);
+    //    _dragonSpawnerScript.isPaused = GameisPaused;
+    //    _joystickScript.isPaused = GameisPaused;
+    //}
     public void StartMiniGame()
     {
         _cameraToggle.CameraToggler();
@@ -157,7 +173,7 @@ public class PauseMenu : MonoBehaviour
         goBackButtonGO.gameObject.SetActive(false);
         winScreen.gameObject.SetActive(false);
         loseScreen1.gameObject.SetActive(false);
-        loseScreen2.gameObject.SetActive(false);
+       // loseScreen2.gameObject.SetActive(false);
         miniGameHolder.gameObject.SetActive(true);
 
     }
@@ -192,6 +208,8 @@ public class PauseMenu : MonoBehaviour
         _playerAimRightLeft.multiplierX = XMultSlider.value;
         _playerAimRightLeft.multiplierY = YMultSlider.value;
         _playerAimRightLeft.invertY = YToggleToggle.isOn;
+        _playerAimRightLeft.joystickSimple.yDiffmax[0] = _playerAimRightLeft.maxAngle / _playerAimRightLeft.multiplierY;
+
 
         MusicToggleToggle.isOn = musicBool;
         SoundToggleToggle.isOn = soundBool;

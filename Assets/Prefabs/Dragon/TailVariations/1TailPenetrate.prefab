@@ -1039,6 +1039,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4544cd07d008f994298440a87c033d2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  progress: 0
   spline: {fileID: 0}
   dragonSpawnerScript: {fileID: 0}
   childrenSegmentHolder: []
@@ -1070,6 +1071,9 @@ MonoBehaviour:
   currentEmissionColor: {r: 0, g: 0, b: 0, a: 0}
   DeathSpawnEffect: {fileID: 7279637847229055903, guid: cead2f35dd4181b4799169d6144a4bef, type: 3}
   ParticleMaterial: {fileID: 2100000, guid: 32c8318ac8a80134a9ca370c4c147fd5, type: 2}
+  elapsedBackTime: 0
+  totalBackDistance: 0
+  initialBackDistance: 0
   powerUpOnDeath: 1
   isdead: 0
   isGoingBack: 0

@@ -3,10 +3,10 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Splines;
-using static UnityEngine.GraphicsBuffer;
 
 public class DragonMovement : MonoBehaviour
 {
+    public float progress;
     public SplineContainer spline;
     public DragonSpawnerNEW dragonSpawnerScript;
 
@@ -45,6 +45,13 @@ public class DragonMovement : MonoBehaviour
     public GameObject DeathSpawnEffect;
     private TrailRenderer trailData;
     public Material ParticleMaterial;
+    
+    //new move logic
+
+    public float elapsedBackTime = 0f;
+    public float totalBackDistance = 0f;
+    public float initialBackDistance = 0f;
+
 
     //public TextMeshPro healthText2;
     // <summary>
@@ -89,16 +96,40 @@ public class DragonMovement : MonoBehaviour
 
         if (!dragonSpawnerScript.isPaused)
         {
-
-            distanceTraveled += currentSpeed * Time.deltaTime;
-            distancePercentage = distanceTraveled / splineLength;
             
-
-            if (!(backTimeT > 0f) && !returnToStart)
+            if (isGoingBack && backTimeT > 0f)
             {
-                if ((distanceTraveled < fastSpeedDistance) && fast)
-                {
+                elapsedBackTime += Time.deltaTime;
 
+                
+                progress = Mathf.Clamp01(elapsedBackTime / backTimeT);
+                distanceTraveled = Mathf.Lerp(initialBackDistance, totalBackDistance, progress);
+
+                
+                if (progress == 1)
+                {
+                    isGoingBack = false;
+                    backTimeT = 0;
+                    elapsedBackTime = 0f;
+                    totalBackDistance = 0;
+                }
+            }
+            else if (returnToStart)
+            {
+                if (distanceTraveled > backDistance)
+                {
+                    currentSpeed = returnToStartSpeed;
+                }
+                else
+                {
+                    returnToStart = false;
+                    currentSpeed = speed;
+                }
+            }
+            else
+            {
+                if (distanceTraveled < fastSpeedDistance && fast)
+                {
                     isGoingBack = false;
                     currentSpeed = fastSpeed;
                 }
@@ -108,72 +139,74 @@ public class DragonMovement : MonoBehaviour
                     isGoingBack = false;
                     currentSpeed = speed;
                 }
+            }
 
-            }
-            else if (distanceTraveled > backDistance && returnToStart)
-            {
-                currentSpeed = returnToStartSpeed;
-            }
-            else if(distanceTraveled < backDistance && returnToStart)
-            {
-                currentSpeed = speed;
-                returnToStart = false;
+            distanceTraveled += currentSpeed * Time.deltaTime;
+            distancePercentage = distanceTraveled / splineLength;
 
-            }
-            else
-            {
-                backTimeT -= Time.deltaTime;
-                isGoingBack = true;
-                currentSpeed = -backSpeed;
-                returnToStart = false;
-            }
-            
-            //goto distence perentage 
             Vector3 currentPosition = spline.EvaluatePosition(distancePercentage);
             transform.position = currentPosition;
-            
 
-
-            //look direction
             Vector3 nextPosition = spline.EvaluatePosition(distancePercentage + 0.001f);
             Vector3 direction = nextPosition - currentPosition;
             transform.rotation = Quaternion.LookRotation(direction);
-
-
-            
-
-
-            if (isdead)
-            {
-                for (int i = 0; i < position; i++)
-                {
-                    try
-                    {
-                        dragonSpawnerScript.tailGO[i].GetComponent<DragonMovement>().backTimeT += backTime;
-                    }
-                    catch
-                    {
-
-                    }
-
-                }
-                isdead = false;
-                dragonSpawnerScript.tailLength -= 1;
-                if (dragonSpawnerScript.tailLength < 1)
-                {
-                    dragonSpawnerScript.WinCondition();
-                }
-                dragonSpawnerScript.SpawnFireAtHead();
-                Destroy(gameObject);
-            }
-            
         }
-        //ChangeTextAlpha(healthTextAlpha);
-        if (textHealthGoBlank && healthText1.color.a > 0) { ChangeTextAlpha(healthText1.color.a - 0.02f); }
 
+        if (isdead)
+        {
+            HandleDeath();
+        }
 
+        if (textHealthGoBlank && healthText1.color.a > 0)
+        {
+            ChangeTextAlpha(healthText1.color.a - 0.02f);
+        }
     }
 
+    private void HandleDeath()
+    {
+        for (int i = 0; i < position; i++)
+        {
+            try
+            {
+                dragonSpawnerScript.tailGOmovementSript[i].GoBackTimer();
+            }
+            catch { }
+        }
+
+        isdead = false;
+        dragonSpawnerScript.tailLength--;
+        if (dragonSpawnerScript.tailLength < 1)
+        {
+            dragonSpawnerScript.WinCondition();
+        }
+        dragonSpawnerScript.SpawnFireAtHead();
+        Destroy(gameObject);
+    }
+
+    public void GoBackTimer()
+    {
+
+        backTimeT += backTime;
+        
+        
+        if (isGoingBack)
+        {
+            totalBackDistance = initialBackDistance - ((backSpeed * backTimeT));
+        }
+        else
+        {
+            initialBackDistance = distanceTraveled;
+            totalBackDistance = distanceTraveled - ((backSpeed * backTimeT));
+        }
+        
+        //if (elapsedBackTime > 0)
+        //{
+        //    elapsedBackTime = 0;
+        //}
+        
+        isGoingBack = true; 
+    }
     public void setSpeedANDDistanceANDHealthANDFastspeed(float newSpeed, float newDistance, float newHealth, float newFastSpeed, float newFastSpeedPercentage, float newObjectLength, float newBackTime, DragonSpawnerNEW newScript)
     {
         speed = newSpeed;
@@ -183,18 +216,20 @@ public class DragonMovement : MonoBehaviour
         fastSpeedPercentage = newFastSpeedPercentage;
         objectLength = newObjectLength;
         backTime = newBackTime;
-        backSpeed = 0.0255f + (newObjectLength - (newSpeed * newBackTime))/newBackTime; //no clue why have to add constant
+        //backSpeed = 0.0255f + (newObjectLength - (newSpeed * newBackTime))/newBackTime; //no clue why have to add constant
+        backSpeed = (newObjectLength - (newSpeed * newBackTime)) / newBackTime;
+        //backSpeed = newSpeed * ((newObjectLength - distanceTraveled) / (newSpeed * newBackTime)); ;
         dragonSpawnerScript = newScript;
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Arrow"))
-        {
-            isdead = true;
-        }
-    }
-    
+    //private void OnTriggerEnter(Collider other)
+    //{
+    //    if (other.CompareTag("Arrow"))
+    //    {
+    //        isdead = true;
+    //    }
+    //}
+
     public void dragonHit(float damage)
     {
         health -= damage;
@@ -202,17 +237,17 @@ public class DragonMovement : MonoBehaviour
 
         textHealthGoBlank = false;
         if (!isHead) ChangeTextAlpha(1f);
-        if (health < 1)
-        {
-            isdead = true;
-        }
+        if (health < 1) isdead = true;
+
         for (int i = 0; i < firstChild.childCount; i++)
         {
             SegmentHolderChildren[i].material.SetColor("_EmissionColor", emissionColor);
-            
         }
         StartCoroutine(SmoothColorChange());
+
+        
     }
+
 
     public void ChangeTextAlpha(float alpha)
     {
@@ -223,26 +258,30 @@ public class DragonMovement : MonoBehaviour
 
     private void OnDestroy()
     {
-       dragonSpawnerScript.powerUPsys.StartPowerDelayRelay(powerUpOnDeath);
-
+      
         try
         {
-            if (powerUpOnDeath != 0)
+            if (!dragonSpawnerScript.isPaused)  //particles appear on restart
             {
+                dragonSpawnerScript.powerUPsys.StartPowerDelayRelay(powerUpOnDeath);
+                if (powerUpOnDeath != 0)
+                {
 
-                GameObject deathEffect = Instantiate(DeathSpawnEffect, transform.position, Quaternion.LookRotation(transform.position - dragonSpawnerScript.playerHolder.transform.position, Vector3.left));
-                ParticleSystemRenderer partSystem = deathEffect.transform.GetChild(0).gameObject.GetComponent<ParticleSystemRenderer>();
+                    GameObject deathEffect = Instantiate(DeathSpawnEffect, transform.position, Quaternion.LookRotation(transform.position - dragonSpawnerScript.playerHolder.transform.position, Vector3.left));
+                    ParticleSystemRenderer partSystem = deathEffect.transform.GetChild(0).gameObject.GetComponent<ParticleSystemRenderer>();
 
-                partSystem.material = ParticleMaterial;
-                partSystem.trailMaterial = ParticleMaterial;
-                Destroy(deathEffect, 10f);
+                    partSystem.material = ParticleMaterial;
+                    partSystem.trailMaterial = ParticleMaterial;
+                    Destroy(deathEffect, 10f);
+                }
+                else
+                {
+                    GameObject deathEffect = Instantiate(DeathSpawnEffect, transform.position, transform.rotation);
+                    Destroy(deathEffect, 10f);
+
+                }
             }
-            else
-            {
-                GameObject deathEffect = Instantiate(DeathSpawnEffect, transform.position, transform.rotation);
-                Destroy(deathEffect, 10f);
-
-            }
+            
         }
         catch { }
             

@@ -1,6 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Splines;
@@ -37,8 +35,8 @@ public class DragonSpawnerNEW : MonoBehaviour
     [Header("Dragon Parts")]
     public float dragonSpeed;
     public float dragonFastSpeed;
-    public float dragonFastPercentage;
     public float dragonStartSpawn;
+    public float dragonFastPercentage;
     public float backTime;
 
     [Header("EndGame")]
@@ -61,6 +59,7 @@ public class DragonSpawnerNEW : MonoBehaviour
     [Header("GameObjects")]
     public GameObject fireFX;
     public GameObject[] tailGO;
+    public DragonMovement[] tailGOmovementSript;
 
 
     public float _t = 0;
@@ -74,6 +73,7 @@ public class DragonSpawnerNEW : MonoBehaviour
     {
         tailLength = bodyVars.Length;
         tailGO = new GameObject[bodyVars.Length + 1];
+        tailGOmovementSript = new DragonMovement[bodyVars.Length + 1];
         spawner = gameObject.GetComponent<DragonSpawnerNEW>();
         powerUPsys = playerHolder.GetComponent<PowerUpSystem>();
         pausemenuScrip = canvas.GetComponent<PauseMenu>();
@@ -91,6 +91,7 @@ public class DragonSpawnerNEW : MonoBehaviour
         tail.name = bodyVars.Length.ToString();
         dragonDistance += tailPartLength;
         tailGO[bodyVars.Length] = tail;
+        tailGOmovementSript[bodyVars.Length] = tail.GetComponent<DragonMovement>();
 
 
         for (int i = bodyVars.Length-1; i > 0; i--)
@@ -100,7 +101,7 @@ public class DragonSpawnerNEW : MonoBehaviour
             body.name = i.ToString();
             dragonDistance += bodyPartLength;
             tailGO[i] = body;
-
+            tailGOmovementSript[i] = body.GetComponent<DragonMovement>();
         }
         
         
@@ -110,6 +111,7 @@ public class DragonSpawnerNEW : MonoBehaviour
         head.GetComponent<DragonMovement>().isHead = true;
         head.name = 0.ToString();
         tailGO[0] = head;
+        tailGOmovementSript[0] = head.GetComponent<DragonMovement>();
         dragonDistance += headPartLength;
 
         float reduceAlphaBy = 1f / (float)alphaGradientAmount;
@@ -173,6 +175,7 @@ public class DragonSpawnerNEW : MonoBehaviour
         pausemenuScrip._joystickScript.isPaused = false;
         pausemenuScrip._adLoaderScript.LoadAd();
         pausemenuScrip.pauseButtonGO.SetActive(true);
+        pausemenuScrip.powerUpButton.SetActive(true);
     }
 
     public void SpawnFireAtHead()

@@ -13,6 +13,7 @@ public class MoveUIElementAlongSpline : MonoBehaviour
     [HideInInspector] public PauseMenu _pauseMenu;
     [HideInInspector] public CameraToggle _cameraToggle;
     [HideInInspector] public DragonSpawnerNEW _dragonSpawnerNew;
+    [HideInInspector] public DiableButtonOnPress _disableButton;
 
 
     public SplineContainer splineContainer; 
@@ -58,7 +59,7 @@ public class MoveUIElementAlongSpline : MonoBehaviour
 
     public void CheckCrosshair()
     {
-        
+
         if ((dragonPos + errorRate) >= t && (dragonPos - errorRate) <= t)
         {
             //_pauseMenu.pressAmount = 0;
@@ -66,7 +67,14 @@ public class MoveUIElementAlongSpline : MonoBehaviour
             _cameraToggle.CameraToggler();
             _dragonSpawnerNew.MiniGameWin();
         }
-        else { _pauseMenu.LoseScreen2(); }
-        
+        else
+        {
+            _pauseMenu.LoseScreen1();
+            _cameraToggle.CameraToggler();
+            _disableButton.DisableButton();
+            
+        }
+
+
     }
 }

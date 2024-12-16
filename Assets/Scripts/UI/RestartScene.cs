@@ -7,6 +7,14 @@ public class RestartScene : MonoBehaviour
 {
     public void Restart()
     {
+        
+
+        StartCoroutine(RestartCoroutine());
+    }
+
+    IEnumerator RestartCoroutine()
+    {
+        yield return null;
         Scene currentScene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(currentScene.name);
     }

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Advertisements;
+using System.Collections;
 
 public class RewardedAdLoader : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
 {
@@ -58,8 +59,16 @@ public class RewardedAdLoader : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsS
             adWatched = true;
             //Debug.Log("Done!!!!!");
             // Grant a reward.
-            gameObject.transform.GetComponent<PauseMenu>().StartMiniGame();
+            StartCoroutine(startminigame());
+
         }
+        
+    }
+    private IEnumerator startminigame()
+    {
+        yield return null;
+        gameObject.transform.GetComponent<PauseMenu>().StartMiniGame();
+        adWatched = false;
     }
 
     // Implement Load and Show Listener error callbacks:

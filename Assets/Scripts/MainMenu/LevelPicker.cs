@@ -11,4 +11,9 @@ public class LevelPicker : MonoBehaviour
     {
         SceneManager.LoadScene( goToLevel);
     }
+    public void NextLevel()
+    {
+        Scene currentScene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(currentScene.buildIndex + 1);
+    }
 }

@@ -45,6 +45,11 @@ public class Arrow : MonoBehaviour
     private void Start()
     {
         killTimeOut = 0.02f;
+        sound = this.GetComponent<AudioSource>();
+        if (dragonSpawner.pausemenuScrip.soundBool == false)
+        {
+            sound.mute = true;
+        }
     }
     private void Update()
     {
@@ -83,7 +88,12 @@ public class Arrow : MonoBehaviour
             killing = false;
             
             killTime = _t;
-            other.gameObject.GetComponent<DragonMovement>().dragonHit(damage);
+            DragonMovement _dragonMovement = other.gameObject.GetComponent<DragonMovement>();
+            if (!_dragonMovement.isGoingBack)
+            {
+                _dragonMovement.dragonHit(damage);
+            }
+            
             if (!penetrate)
             {
                 Destroy(gameObject);

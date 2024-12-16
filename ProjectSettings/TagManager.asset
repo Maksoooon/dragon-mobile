@@ -11,6 +11,8 @@ TagManager:
   - Canvas
   - CameraHolder1
   - DragonPATHtag
+  - SecondCamera
+  - MainMenuManager
   layers:
   - Default
   - TransparentFX
