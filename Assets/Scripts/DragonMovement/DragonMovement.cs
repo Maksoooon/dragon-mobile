@@ -6,9 +6,10 @@ using UnityEngine.Splines;
 
 public class DragonMovement : MonoBehaviour
 {
+    public bool isdead = false;
     public float progress;
     public SplineContainer spline;
-    public DragonSpawnerNEW dragonSpawnerScript;
+    public DragonSpawnerNEW _dragonSpawnerScript;
 
     public GameObject[] childrenSegmentHolder;
     public Renderer[] SegmentHolderChildren;
@@ -65,7 +66,6 @@ public class DragonMovement : MonoBehaviour
 
     public int powerUpOnDeath = 0;
 
-    public bool isdead = false;
     public bool isGoingBack = false;
     public bool fast = true;
 
@@ -73,7 +73,7 @@ public class DragonMovement : MonoBehaviour
     {
         spline = GameObject.FindWithTag("DragonPATHtag").GetComponent<SplineContainer>();
         splineLength = spline.CalculateLength();
-        fastSpeedDistance = splineLength * fastSpeedPercentage + distanceTraveled - dragonSpawnerScript.dragonStartSpawn;
+        fastSpeedDistance = splineLength * fastSpeedPercentage + distanceTraveled - _dragonSpawnerScript.dragonStartSpawn;
         healthText1.text = health.ToString();
         backTimeT = 0f;
         textHealthGoBlank = true;
@@ -94,24 +94,37 @@ public class DragonMovement : MonoBehaviour
     private void Update()
     {
 
-        if (!dragonSpawnerScript.isPaused)
+        if (isdead)
         {
-            
+            HandleDeath();
+        }
+
+        if (textHealthGoBlank && healthText1.color.a > 0f)
+        {
+            ChangeTextAlpha(healthText1.color.a - 0.02f);
+        }
+    }
+    private void FixedUpdate()
+    {
+        if (!_dragonSpawnerScript.isPaused)
+        {
+
             if (isGoingBack && backTimeT > 0f)
             {
-                elapsedBackTime += Time.deltaTime;
+                elapsedBackTime += Time.fixedDeltaTime;
 
-                
+
                 progress = Mathf.Clamp01(elapsedBackTime / backTimeT);
                 distanceTraveled = Mathf.Lerp(initialBackDistance, totalBackDistance, progress);
 
-                
+
                 if (progress == 1)
                 {
+                    distanceTraveled = totalBackDistance;
                     isGoingBack = false;
-                    backTimeT = 0;
+                    backTimeT = 0f;
                     elapsedBackTime = 0f;
-                    totalBackDistance = 0;
+                    totalBackDistance = 0f;
                 }
             }
             else if (returnToStart)
@@ -140,8 +153,11 @@ public class DragonMovement : MonoBehaviour
                     currentSpeed = speed;
                 }
             }
-
-            distanceTraveled += currentSpeed * Time.deltaTime;
+            if (!isGoingBack)
+            {
+                distanceTraveled += currentSpeed * Time.fixedDeltaTime;
+            }
+            
             distancePercentage = distanceTraveled / splineLength;
 
             Vector3 currentPosition = spline.EvaluatePosition(distancePercentage);
@@ -151,16 +167,6 @@ public class DragonMovement : MonoBehaviour
             Vector3 direction = nextPosition - currentPosition;
             transform.rotation = Quaternion.LookRotation(direction);
         }
-
-        if (isdead)
-        {
-            HandleDeath();
-        }
-
-        if (textHealthGoBlank && healthText1.color.a > 0)
-        {
-            ChangeTextAlpha(healthText1.color.a - 0.02f);
-        }
     }
 
     private void HandleDeath()
@@ -169,18 +175,18 @@ public class DragonMovement : MonoBehaviour
         {
             try
             {
-                dragonSpawnerScript.tailGOmovementSript[i].GoBackTimer();
+                _dragonSpawnerScript.tailGOmovementSript[i].GoBackTimer();
             }
             catch { }
         }
 
         isdead = false;
-        dragonSpawnerScript.tailLength--;
-        if (dragonSpawnerScript.tailLength < 1)
+        _dragonSpawnerScript.tailLength--;
+        if (_dragonSpawnerScript.tailLength < 1)
         {
-            dragonSpawnerScript.WinCondition();
+            _dragonSpawnerScript.WinCondition();
         }
-        dragonSpawnerScript.SpawnFireAtHead();
+        _dragonSpawnerScript.SpawnFireAtHead();
         Destroy(gameObject);
     }
 
@@ -192,12 +198,13 @@ public class DragonMovement : MonoBehaviour
         
         if (isGoingBack)
         {
-            totalBackDistance = initialBackDistance - ((backSpeed * backTimeT));
+            totalBackDistance -= ((objectLength - (speed * backTime)));
         }
         else
         {
             initialBackDistance = distanceTraveled;
-            totalBackDistance = distanceTraveled - ((backSpeed * backTimeT));
+            totalBackDistance = distanceTraveled - ((objectLength  - (speed * (backTime - Time.deltaTime))));
+            elapsedBackTime = 0f;
         }
         
         //if (elapsedBackTime > 0)
@@ -219,7 +226,7 @@ public class DragonMovement : MonoBehaviour
         //backSpeed = 0.0255f + (newObjectLength - (newSpeed * newBackTime))/newBackTime; //no clue why have to add constant
         backSpeed = (newObjectLength - (newSpeed * newBackTime)) / newBackTime;
         //backSpeed = newSpeed * ((newObjectLength - distanceTraveled) / (newSpeed * newBackTime)); ;
-        dragonSpawnerScript = newScript;
+        _dragonSpawnerScript = newScript;
     }
 
     //private void OnTriggerEnter(Collider other)
@@ -261,13 +268,13 @@ public class DragonMovement : MonoBehaviour
       
         try
         {
-            if (!dragonSpawnerScript.isPaused)  //particles appear on restart
+            if (!_dragonSpawnerScript.isPaused)  //particles appear on restart
             {
-                dragonSpawnerScript.powerUPsys.StartPowerDelayRelay(powerUpOnDeath);
+                _dragonSpawnerScript.powerUPsys.StartPowerDelayRelay(powerUpOnDeath);
                 if (powerUpOnDeath != 0)
                 {
 
-                    GameObject deathEffect = Instantiate(DeathSpawnEffect, transform.position, Quaternion.LookRotation(transform.position - dragonSpawnerScript.playerHolder.transform.position, Vector3.left));
+                    GameObject deathEffect = Instantiate(DeathSpawnEffect, transform.position, Quaternion.LookRotation(transform.position - _dragonSpawnerScript.playerHolder.transform.position, Vector3.left));
                     ParticleSystemRenderer partSystem = deathEffect.transform.GetChild(0).gameObject.GetComponent<ParticleSystemRenderer>();
 
                     partSystem.material = ParticleMaterial;

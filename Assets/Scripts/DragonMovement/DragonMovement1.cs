@@ -8,7 +8,7 @@ using static UnityEngine.GraphicsBuffer;
 public class DragonMovement1 : MonoBehaviour
 {
     public SplineContainer spline;
-    public DragonSpawnerNEW dragonSpawnerScript;
+    public DragonSpawnerNEW _dragonSpawnerScript;
 
     public GameObject[] childrenSegmentHolder;
     public Renderer[] SegmentHolderChildren;
@@ -66,7 +66,7 @@ public class DragonMovement1 : MonoBehaviour
     {
         spline = GameObject.FindWithTag("DragonPATHtag").GetComponent<SplineContainer>();
         splineLength = spline.CalculateLength();
-        fastSpeedDistance = splineLength * fastSpeedPercentage + distanceTraveled - dragonSpawnerScript.dragonStartSpawn;
+        fastSpeedDistance = splineLength * fastSpeedPercentage + distanceTraveled - _dragonSpawnerScript.dragonStartSpawn;
         healthText1.text = health.ToString();
         backTimeT = 0f;
         textHealthGoBlank = true;
@@ -87,7 +87,7 @@ public class DragonMovement1 : MonoBehaviour
     private void Update()
     {
 
-        if (!dragonSpawnerScript.isPaused)
+        if (!_dragonSpawnerScript.isPaused)
         {
 
             
@@ -150,7 +150,7 @@ public class DragonMovement1 : MonoBehaviour
                 {
                     try
                     {
-                        dragonSpawnerScript.tailGO[i].GetComponent<DragonMovement>().backTimeT += backTime;
+                        _dragonSpawnerScript.tailGO[i].GetComponent<DragonMovement>().backTimeT += backTime;
                     }
                     catch
                     {
@@ -159,12 +159,12 @@ public class DragonMovement1 : MonoBehaviour
 
                 }
                 isdead = false;
-                dragonSpawnerScript.tailLength -= 1;
-                if (dragonSpawnerScript.tailLength < 1)
+                _dragonSpawnerScript.tailLength -= 1;
+                if (_dragonSpawnerScript.tailLength < 1)
                 {
-                    dragonSpawnerScript.WinCondition();
+                    _dragonSpawnerScript.WinCondition();
                 }
-                dragonSpawnerScript.SpawnFireAtHead();
+                _dragonSpawnerScript.SpawnFireAtHead();
                 Destroy(gameObject);
             }
             
@@ -187,7 +187,7 @@ public class DragonMovement1 : MonoBehaviour
         //backSpeed = 0.0255f + (newObjectLength - (newSpeed * newBackTime))/newBackTime; //no clue why have to add constant
         backSpeed = (newObjectLength - (newSpeed * newBackTime)) / newBackTime;
         //backSpeed = newSpeed * ((newObjectLength - distanceTraveled) / (newSpeed * newBackTime)); ;
-        dragonSpawnerScript = newScript;
+        _dragonSpawnerScript = newScript;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -229,13 +229,13 @@ public class DragonMovement1 : MonoBehaviour
       
         try
         {
-            if (!dragonSpawnerScript.isPaused)  //particles appear on restart
+            if (!_dragonSpawnerScript.isPaused)  //particles appear on restart
             {
-                dragonSpawnerScript.powerUPsys.StartPowerDelayRelay(powerUpOnDeath);
+                _dragonSpawnerScript.powerUPsys.StartPowerDelayRelay(powerUpOnDeath);
                 if (powerUpOnDeath != 0)
                 {
 
-                    GameObject deathEffect = Instantiate(DeathSpawnEffect, transform.position, Quaternion.LookRotation(transform.position - dragonSpawnerScript.playerHolder.transform.position, Vector3.left));
+                    GameObject deathEffect = Instantiate(DeathSpawnEffect, transform.position, Quaternion.LookRotation(transform.position - _dragonSpawnerScript.playerHolder.transform.position, Vector3.left));
                     ParticleSystemRenderer partSystem = deathEffect.transform.GetChild(0).gameObject.GetComponent<ParticleSystemRenderer>();
 
                     partSystem.material = ParticleMaterial;

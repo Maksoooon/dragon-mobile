@@ -5,7 +5,8 @@ public class PauseMenu : MonoBehaviour
 {
 
     public static bool GameisPaused = false;
-
+    [Header("FPS Control")]
+    public int targetFPS;
     [Header("GameObjects")]
     //public GameObject MainCameraHolder;
     public GameObject pauseButtonGO;
@@ -54,6 +55,7 @@ public class PauseMenu : MonoBehaviour
 
     void Start()
     {
+
         pauseButtonGO.SetActive(false);
         pauseMenuUI.SetActive(false);
         settingsMenuUI.SetActive(false);
@@ -78,7 +80,11 @@ public class PauseMenu : MonoBehaviour
         _countdown = gameObject.GetComponent<Countdown>();
         GetSettings();
     }
-
+    private void Awake()
+    {
+        Application.targetFrameRate = targetFPS;
+        QualitySettings.vSyncCount = 0;
+    }
     public void Pause()
     {
         GameisPaused = true;

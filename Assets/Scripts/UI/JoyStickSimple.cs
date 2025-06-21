@@ -76,32 +76,7 @@ public class JoyStickSimple : MonoBehaviour
         }
 
 
-        /*
-        if (!isPaused)
-        {
-            if (Input.GetMouseButtonDown(0)) 
-            {
-
-                emptyStayRight.transform.position = Input.mousePosition;
-                isDragging = true;
-            }
-            else if (Input.GetMouseButton(0) && isDragging) 
-            {
-
-                Vector2 targetPosition = (Vector2)Input.mousePosition - new Vector2(xDiffLast, yDiffLast);
-                emptyMovingRight.transform.position = Vector2.Lerp(emptyMovingRight.transform.position, targetPosition, Time.deltaTime * movementSpeed);
-                xDiff = emptyStayRight.transform.position.x - emptyMovingRight.transform.position.x;
-                yDiff = emptyStayRight.transform.position.y - emptyMovingRight.transform.position.y;
-            }
-            else if (Input.GetMouseButtonUp(0) && isDragging) 
-            {
-
-                xDiffLast = xDiff;
-                yDiffLast = Mathf.Clamp(yDiff, -120, 120);
-                isDragging = false;
-            }
-        }
-        */
+      
 
     }
 

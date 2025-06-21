@@ -7,22 +7,22 @@ using UnityEngine.SceneManagement;
 public class DragonHeadGameChecker : MonoBehaviour
 {
     public DragonMovement dragonMovementScript;
-    public DragonSpawnerNEW dragonSpawnerScript;
+    public DragonSpawnerNEW _dragonSpawnerScript;
     public float endGame;
 
     void Start()
     {
         dragonMovementScript = gameObject.GetComponent<DragonMovement>();
-        dragonSpawnerScript = dragonMovementScript.dragonSpawnerScript;
-        endGame = dragonSpawnerScript.endPercentage;
+        _dragonSpawnerScript = dragonMovementScript._dragonSpawnerScript;
+        endGame = _dragonSpawnerScript.endPercentage;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (dragonMovementScript.distancePercentage > endGame & dragonSpawnerScript._t > dragonSpawnerScript.loseProtectTime)
+        if (dragonMovementScript.distancePercentage > endGame & _dragonSpawnerScript._t > _dragonSpawnerScript.loseProtectTime)
         {
-            dragonSpawnerScript.LoseCondition();
+            _dragonSpawnerScript.LoseCondition();
             
         }
     }

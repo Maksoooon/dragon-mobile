@@ -16,7 +16,7 @@ public class PlayerAimRightLeft : MonoBehaviour
     public float rotationAngleX;
     public float rotationAngleY;
     public float maxAngle = 30f;
-    public float minAngle = -10f;
+    public float minAngle = -20f;
 
     public float smoothingFactor = 5f;
     private void Start()
